@@ -12,19 +12,22 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.blockost.tiny_todo.task.Task
+import com.blockost.tiny_todo.task.TaskViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
 fun App() {
-    val tasks = mutableListOf<Task>()
+    val taskVMs = mutableListOf<TaskViewModel>()
     for (i in 0..100) {
-        tasks.add(Task("$i", "Task $i", completed = i % 2 == 0))
+        taskVMs.add(TaskViewModel(Task("$i", "Task $i", completed = i % 2 == 0)))
     }
 
     MaterialTheme {
@@ -36,19 +39,21 @@ fun App() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(
-                items = tasks,
-                key = { task -> task.id }
-            ) { task ->
+                items = taskVMs,
+                key = { taskVM -> taskVM.uiState.value.id }
+            ) { taskVM ->
+                val task = taskVM.uiState.collectAsState().value
+                println("rendering task ${task.id}")
                 Row(
                     modifier = Modifier
                         .border(1.dp, Color.Red)
                         .fillMaxWidth()
-                        .clickable { println("clicked $task") },
+                        .clickable { println("clicked $taskVM") },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
                         checked = task.completed,
-                        onCheckedChange = { task.completed = it }
+                        onCheckedChange = { value -> taskVM.updateCompleted(value) }
                     )
                     Text(
                         text = task.title,

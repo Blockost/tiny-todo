@@ -1,5 +1,6 @@
 package com.blockost.tiny_todo.ui.layouts
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,7 +27,8 @@ fun TaskLayout(task: Task, vm: TaskListViewModel, modifier: Modifier = Modifier)
     var showSubtasks by rememberSaveable { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.border(1.dp, Color.Blue, RoundedCornerShape(8.dp))
+        modifier = modifier
+            .border(1.dp, Color.Blue, RoundedCornerShape(8.dp))
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().clickable { println("clicked ${task.id}") },
@@ -59,10 +61,10 @@ fun TaskLayout(task: Task, vm: TaskListViewModel, modifier: Modifier = Modifier)
             }
         }
 
-        if (showSubtasks) {
+        AnimatedVisibility(showSubtasks) {
             for (subtask in task.subtasks) {
                 println("rendering subtask ${task.id}.${subtask.id}")
-                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.width(10.dp))
                     Checkbox(
                         checked = subtask.completed,

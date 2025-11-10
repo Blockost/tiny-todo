@@ -1,5 +1,8 @@
 package com.blockost.tiny_todo.ui.screens
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -13,11 +16,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blockost.tiny_todo.task.TaskListViewModel
 import com.blockost.tiny_todo.ui.layouts.TaskLayout
-
 
 @Composable
 fun TaskListScreen(vm: TaskListViewModel = viewModel()) {
@@ -27,7 +30,7 @@ fun TaskListScreen(vm: TaskListViewModel = viewModel()) {
         println("Loading...")
         Column(
             modifier = Modifier
-                .safeContentPadding()
+                .safeDrawingPadding()
                 .border(1.dp, Color.Blue)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -39,7 +42,7 @@ fun TaskListScreen(vm: TaskListViewModel = viewModel()) {
         LazyColumn(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
-                .safeContentPadding()
+                .safeDrawingPadding()
                 .border(1.dp, Color.Blue)
                 .padding(10.dp)
                 .fillMaxSize(),
@@ -51,7 +54,15 @@ fun TaskListScreen(vm: TaskListViewModel = viewModel()) {
                 key = { task -> task.id }
             ) { task ->
                 println("rendering task ${task.id}")
-                TaskLayout(task, vm, modifier = Modifier.animateItem())
+
+                val fastAnimationModifier = Modifier.animateItem(
+                    placementSpec = spring(
+                        stiffness = Spring.StiffnessMedium,
+                        visibilityThreshold = IntOffset.VisibilityThreshold
+                    ),
+                    fadeOutSpec = spring(stiffness = Spring.StiffnessMedium)
+                )
+                TaskLayout(task, vm, modifier = fastAnimationModifier)
             }
         }
     }

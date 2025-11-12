@@ -24,6 +24,7 @@ import tiny_todo.composeapp.generated.resources.close_24px
 
 @Composable
 fun TaskLayout(task: Task, vm: TaskListViewModel, modifier: Modifier = Modifier) {
+    // TODO 2025-11-11 Blockost Change this as this it not persisted when switching to another app
     var showSubtasks by rememberSaveable { mutableStateOf(false) }
 
     Column(
@@ -45,10 +46,12 @@ fun TaskLayout(task: Task, vm: TaskListViewModel, modifier: Modifier = Modifier)
                 textDecoration = if (task.completed) TextDecoration.LineThrough else TextDecoration.None,
             )
             // Subtask count + toggle visibility
-            SuggestionChip(
-                onClick = { showSubtasks = !showSubtasks },
-                label = { Text("${task.subtasks.count { it.completed }} / ${task.subtasks.count()}") }
-            )
+            if (task.subtasks.isNotEmpty()) {
+                SuggestionChip(
+                    onClick = { showSubtasks = !showSubtasks },
+                    label = { Text("${task.subtasks.count { it.completed }} / ${task.subtasks.count()}") }
+                )
+            }
             // Delete task
             IconButton(
                 onClick = { vm.removeTask(task.id) },

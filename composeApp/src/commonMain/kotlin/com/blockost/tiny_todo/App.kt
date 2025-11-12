@@ -2,6 +2,7 @@ package com.blockost.tiny_todo
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import com.blockost.tiny_todo.task.TaskListViewModel
 import com.blockost.tiny_todo.ui.screens.TaskListScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -9,6 +10,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Preview
 fun App() {
     MaterialTheme {
-        TaskListScreen()
+        TaskListScreen(TaskListViewModel(false))
     }
 }

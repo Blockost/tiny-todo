@@ -1,3 +1,12 @@
 package com.blockost.tiny_todo.subtask
 
-data class Subtask(val id: String, var title: String, var completed: Boolean = false)
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Subtask(
+    val id: String,
+    var title: String,
+    @SerialName("is_completed")
+    var completed: Boolean = false
+)

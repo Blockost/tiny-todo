@@ -2,16 +2,19 @@ package com.blockost.tiny_todo.task
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.blockost.tiny_todo.TaskRepository
 import com.blockost.tiny_todo.subtask.Subtask
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class TaskListViewModel() : ViewModel() {
+class TaskListViewModel(val useMockTasks: Boolean = false) : ViewModel() {
     private val _uiState = MutableStateFlow(TaskListUiState())
 
     val uiState = _uiState.asStateFlow()
+
+    private val taskRepository = TaskRepository()
 
     init {
         fetchTasks()
@@ -19,24 +22,30 @@ class TaskListViewModel() : ViewModel() {
 
     private fun fetchTasks() {
         _uiState.update { it.copy(isLoading = true) }
+        val tasks = mutableListOf<Task>()
 
+        // TODO 2025-11-11 Blockost Make sure network request should be initiated by the view model itself
         viewModelScope.launch {
-            // Simulate data fetching from a repository
-            kotlinx.coroutines.delay(1000)
+            if (useMockTasks) {
+                // Simulate data fetching from a repository
+                kotlinx.coroutines.delay(1000)
 
-            val fetchedTasks = mutableListOf<Task>()
-            for (i in 0..100) {
-                fetchedTasks.add(
-                    Task(
-                        id = "$i",
-                        title = "Task $i",
-                        completed = i % 2 == 0,
-                        subtasks = listOf(Subtask("$i", "Subtask $i"))
+                for (i in 0..100) {
+                    tasks.add(
+                        Task(
+                            id = "$i",
+                            title = "Task $i",
+                            completed = i % 2 == 0,
+                            subtasks = listOf(Subtask("$i", "Subtask $i"))
+                        )
                     )
-                )
+                }
+            } else {
+                val fetchedTasks = taskRepository.getTasksWithSubtasks(false)
+                tasks.addAll(fetchedTasks)
             }
 
-            _uiState.update { it.copy(tasks = fetchedTasks, isLoading = false) }
+            _uiState.update { it.copy(tasks = tasks, isLoading = false) }
         }
     }
 
